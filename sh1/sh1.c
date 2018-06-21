@@ -7,6 +7,25 @@
 #define SIZE 1024
 char* buff;
 
+void split(char* argv[], char* argstr){
+    if(argstr == NULL){
+        argv[0] = NULL;
+        return ;
+    }
+    char *tmp;
+    int len = strlen(argstr);
+    int argi = 0;
+    tmp = strtok(argstr, " ");
+    while(tmp){
+        int len = strlen(tmp);
+        argv[argi] = (char*)malloc(len+1);
+        strcpy(argv[argi], tmp);
+        argi++;
+        tmp = strtok(NULL, " ");
+    }
+    argv[argi] = NULL;
+}
+
 void cd(char* path){
     chdir(path);
 }
@@ -20,8 +39,10 @@ void pwd(){
 void ls(char* cmd){
     pid_t pid;
     pid = fork();
+    char * argv[25];
+    split(argv, cmd);
     if(pid == 0){
-        execl("/bin/sh", "sh", "-c", cmd, NULL);
+        execvp("ls", argv);
         _exit(127);
     }
     else{
@@ -32,8 +53,10 @@ void ls(char* cmd){
 void echo(char* cmd){
     pid_t pid;
     pid = fork();
+    char* argv[25];
+    split(argv, cmd);
     if(pid == 0){
-        execl("/bin/sh", "sh", "-c", cmd, NULL);
+        execvp("echo", argv);
         _exit(127);
     }
     else{
