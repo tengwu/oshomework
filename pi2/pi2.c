@@ -40,7 +40,7 @@ int main(int argc, char const *argv[])
 		pthread_create(&thread[i], NULL, compute, &i);
 		pthread_join(thread[i], NULL);
 	}
-
+	
 	for(i = 1; i <= N; i++){
 		ans += res[i];
 	}
