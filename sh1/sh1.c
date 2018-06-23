@@ -7,8 +7,9 @@
 #define SIZE 1024
 char* buff;
 
-void split(char* argv[], char* argstr){
-    if(argstr == NULL){
+void split(char* argv[], char* argstr)
+{
+    if(argstr == NULL) {
         argv[0] = NULL;
         return ;
     }
@@ -16,7 +17,7 @@ void split(char* argv[], char* argstr){
     int len = strlen(argstr);
     int argi = 0;
     tmp = strtok(argstr, " ");
-    while(tmp){
+    while(tmp) {
         int len = strlen(tmp);
         argv[argi] = (char*)malloc(len+1);
         strcpy(argv[argi], tmp);
@@ -26,40 +27,42 @@ void split(char* argv[], char* argstr){
     argv[argi] = NULL;
 }
 
-void cd(char* path){
+void cd(char* path)
+{
     chdir(path);
 }
 
-void pwd(){
+void pwd()
+{
     char cwd[105];
     getcwd(cwd, sizeof(cwd));
     printf("%s\n", cwd);
 }
 
-void ls(char* cmd){
+void ls(char* cmd)
+{
     pid_t pid;
     pid = fork();
     char * argv[25];
     split(argv, cmd);
-    if(pid == 0){
+    if(pid == 0) {
         execvp("ls", argv);
         _exit(127);
-    }
-    else{
+    } else {
         wait(NULL);
     }
 }
 
-void echo(char* cmd){
+void echo(char* cmd)
+{
     pid_t pid;
     pid = fork();
     char* argv[25];
     split(argv, cmd);
-    if(pid == 0){
+    if(pid == 0) {
         execvp("echo", argv);
         _exit(127);
-    }
-    else{
+    } else {
         wait(NULL);
     }
 }
@@ -67,26 +70,22 @@ void echo(char* cmd){
 int main(int argc, char *argv[])
 {
     buff = (char*)malloc(SIZE);
-    while(1){
+    while(1) {
         printf("$ ");
         fgets(buff, SIZE, stdin);
         buff[strlen(buff)-1] = '\0';
-        if(!strcmp(buff, "exit")){
+        if(!strcmp(buff, "exit")) {
             exit(0);
         }
-        if(buff[0] == 'c' && buff[1] == 'd'){
+        if(buff[0] == 'c' && buff[1] == 'd') {
             cd(buff+3);
-        }
-        else if(!strcmp(buff, "pwd")){
+        } else if(!strcmp(buff, "pwd")) {
             pwd();
-        }
-        else if(buff[0] == 'l' && buff[1] == 's'){
+        } else if(buff[0] == 'l' && buff[1] == 's') {
             ls(buff);
-        }
-        else if(buff[0] == 'e' && buff[1] == 'c'){
+        } else if(buff[0] == 'e' && buff[1] == 'c') {
             echo(buff);
-        }
-        else{
+        } else {
             printf("Unknown neibu or waibu command.\n");
         }
     }

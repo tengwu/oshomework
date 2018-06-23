@@ -74,12 +74,12 @@ void *consume(void *arg)
     int i;
     int item;
 
-    for (i = 0; i < ITEM_COUNT; i++) { 
+    for (i = 0; i < ITEM_COUNT; i++) {
         sema_wait(&full_buffer_sema[2]);
         sema_wait(&mutex_sema[2]);
 
         item = get_item(2);
-        printf("		consume item: %c\n", item); 
+        printf("		consume item: %c\n", item);
 
         sema_signal(&mutex_sema[2]);
         sema_signal(&empty_buffer_sema[2]);
@@ -89,67 +89,67 @@ void *consume(void *arg)
 }
 
 void *produce(void *arg)
-{	
-	int i;
-	int item;
+{
+    int i;
+    int item;
 
-	for(i = 0; i < ITEM_COUNT; i++){
-		sema_wait(&empty_buffer_sema[1]);
-		sema_wait(&mutex_sema[1]);
+    for(i = 0; i < ITEM_COUNT; i++) {
+        sema_wait(&empty_buffer_sema[1]);
+        sema_wait(&mutex_sema[1]);
 
-		item = 'a'+i;
-		put_item(1, item);
-		printf("produce item: %c\n", item);
+        item = 'a'+i;
+        put_item(1, item);
+        printf("produce item: %c\n", item);
 
-		sema_signal(&mutex_sema[1]);
-		sema_signal(&full_buffer_sema[1]);
-	}
+        sema_signal(&mutex_sema[1]);
+        sema_signal(&full_buffer_sema[1]);
+    }
 
-	return NULL;
+    return NULL;
 }
 
 void *compute(void *arg)
 {
-	int i;
-	int item;
+    int i;
+    int item;
 
-	for(i = 0; i < ITEM_COUNT; i++){
-		sema_wait(&full_buffer_sema[1]);
-		sema_wait(&mutex_sema[1]);
-		sema_wait(&empty_buffer_sema[2]);
-		sema_wait(&mutex_sema[2]);
+    for(i = 0; i < ITEM_COUNT; i++) {
+        sema_wait(&full_buffer_sema[1]);
+        sema_wait(&mutex_sema[1]);
+        sema_wait(&empty_buffer_sema[2]);
+        sema_wait(&mutex_sema[2]);
 
-		item = get_item(1);
-		item += 'A'-'a';	
-		put_item(2, item);
-		printf("	compute item: %c -> %c\n", item-'A'+'a', item);
+        item = get_item(1);
+        item += 'A'-'a';
+        put_item(2, item);
+        printf("	compute item: %c -> %c\n", item-'A'+'a', item);
 
-		sema_signal(&mutex_sema[1]);
-		sema_signal(&mutex_sema[2]);
-		sema_signal(&empty_buffer_sema[1]);
-		sema_signal(&full_buffer_sema[2]);
-	}
+        sema_signal(&mutex_sema[1]);
+        sema_signal(&mutex_sema[2]);
+        sema_signal(&empty_buffer_sema[1]);
+        sema_signal(&full_buffer_sema[2]);
+    }
 
-	return NULL;
+    return NULL;
 }
 
 int main()
 {
-	pthread_t producer, computer, consumer;
-	sema_init(&mutex_sema[1], 1);
-	sema_init(&mutex_sema[2], 1);
-	sema_init(&empty_buffer_sema[1], CAPACITY - 1);
-	sema_init(&empty_buffer_sema[2], CAPACITY - 1);
-	sema_init(&full_buffer_sema[1], 0);
-	sema_init(&full_buffer_sema[2], 0);
+    pthread_t producer, computer, consumer;
+    sema_init(&mutex_sema[1], 1);
+    sema_init(&mutex_sema[2], 1);
+    sema_init(&empty_buffer_sema[1], CAPACITY - 1);
+    sema_init(&empty_buffer_sema[2], CAPACITY - 1);
+    sema_init(&full_buffer_sema[1], 0);
+    sema_init(&full_buffer_sema[2], 0);
 
-	pthread_create(&producer, NULL, produce, NULL);
-	pthread_create(&computer, NULL, compute, NULL);
-	pthread_create(&consumer, NULL, consume, NULL);
+    pthread_create(&producer, NULL, produce, NULL);
+    pthread_create(&computer, NULL, compute, NULL);
+    pthread_create(&consumer, NULL, consume, NULL);
 
-	pthread_join(producer, NULL);
-	pthread_join(computer, NULL);
-	pthread_join(consumer, NULL);
+    pthread_join(producer, NULL);
+    pthread_join(computer, NULL);
+    pthread_join(consumer, NULL);
 
     return 0;
 }

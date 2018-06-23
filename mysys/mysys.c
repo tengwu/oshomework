@@ -3,20 +3,19 @@
 #include <string.h>
 #include <unistd.h>
 
-int mysys(char* cmd){
+int mysys(char* cmd)
+{
     pid_t pid;
     int ret = 1;
     pid = fork();
-    if(pid < 0){
+    if(pid < 0) {
         ret = -1;
-    }
-    else if(pid == 0){
+    } else if(pid == 0) {
         ret = execl("/bin/sh", "sh", "-c", cmd, NULL);
         _exit(127);
-    }
-    else{
+    } else {
         int error = wait(NULL);
-        if(error < 0){
+        if(error < 0) {
             printf("Some error ocured.\n");
         }
     }

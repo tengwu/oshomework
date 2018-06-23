@@ -9,8 +9,9 @@
 #define SIZE 1024
 char* buff;
 
-void split(char** argv, char* argstr){
-    if(argstr == NULL){
+void split(char** argv, char* argstr)
+{
+    if(argstr == NULL) {
         argv[0] = NULL;
         return ;
     }
@@ -18,7 +19,7 @@ void split(char** argv, char* argstr){
     int len = strlen(argstr);
     int argi = 0;
     tmp = strtok(argstr, " ");
-    while(tmp){
+    while(tmp) {
         int len = strlen(tmp);
         argv[argi] = (char*)malloc(len+1);
         strcpy(argv[argi], tmp);
@@ -28,7 +29,8 @@ void split(char** argv, char* argstr){
     argv[argi] = NULL;
 }
 
-char* getCommand(char* buff){
+char* getCommand(char* buff)
+{
     char* tmp = strtok(buff, " ");
     if(tmp)
         return tmp;
@@ -36,68 +38,72 @@ char* getCommand(char* buff){
     return NULL;
 }
 
-void cd(char* path){
+void cd(char* path)
+{
     chdir(path);
 }
 
-void pwd(){
+void pwd()
+{
     char cwd[105];
     getcwd(cwd, sizeof(cwd));
     printf("%s\n", cwd);
 }
 
-void ls(char** argv){
+void ls(char** argv)
+{
     pid_t pid;
     pid = fork();
-    if(pid == 0){
+    if(pid == 0) {
         execvp("ls", argv);
         _exit(127);
-    }
-    else{
+    } else {
         wait(NULL);
     }
 }
 
-void cat(char** argv){
+void cat(char** argv)
+{
     int file;
     char c;
-    if(argv[1] == NULL){
+    if(argv[1] == NULL) {
         printf("Error command.\n");
         return ;
     }
     char* filename = argv[1];
     // printf("fname = %s\n", filename);
     file = open(filename, O_RDONLY);
-    if(file == -1){
+    if(file == -1) {
         printf("Error when open file.\n");
         return ;
     }
     int flag = 0;
     flag = read(file, &c, sizeof(char));
-    while(flag != -1 && flag != 0){
+    while(flag != -1 && flag != 0) {
         printf("%c", c);
         flag = read(file, &c, sizeof(char));
     }
-    if(flag == -1){
+    if(flag == -1) {
         printf("Error when read file.\n");
         return ;
     }
     close(file);
 }
 
-void echo(char** argv){
+void echo(char** argv)
+{
     pid_t pid;
     pid = fork();
-    if(pid == 0){
+    if(pid == 0) {
         execvp("echo", argv);
         _exit(127);
-    }
-    else{
+    } else {
         wait(NULL);
     }
 }
 
-void oRedirect(char* path){
+void oRedirect(char* path)
+{
     if(!path)
         return ;
 
@@ -109,8 +115,9 @@ void oRedirect(char* path){
 
     return ;
 }
-    
-void iRedirect(char* path){
+
+void iRedirect(char* path)
+{
     if(!path)
         return ;
 
@@ -123,7 +130,8 @@ void iRedirect(char* path){
     return ;
 }
 
-void noRedirect(){
+void noRedirect()
+{
     int file;
     file = open("/dev/tty", O_RDWR);
     dup2(file, 0);
@@ -131,14 +139,14 @@ void noRedirect(){
     dup2(file, 2);
 }
 
-void redirect(char** argv){
+void redirect(char** argv)
+{
     int i = 0;
-    while(argv[i]){
-        if(!strcmp(argv[i], ">")){
+    while(argv[i]) {
+        if(!strcmp(argv[i], ">")) {
             oRedirect(argv[i+1]);
             argv[i] = NULL;
-        }
-        else if(!strcmp(argv[i], "<")){
+        } else if(!strcmp(argv[i], "<")) {
             iRedirect(argv[i+1]);
             argv[i] = NULL;
         }
@@ -149,7 +157,7 @@ void redirect(char** argv){
 int main(int argc, char *argv[])
 {
     buff = (char*)malloc(SIZE);
-    while(1){
+    while(1) {
         printf("$ ");
         fgets(buff, SIZE, stdin);
         buff[strlen(buff)-1] = '\0';
@@ -160,25 +168,20 @@ int main(int argc, char *argv[])
         // I/O redirect
         redirect(argv);
 
-        if(!strcmp(buff, "exit")){
+        if(!strcmp(buff, "exit")) {
             exit(0);
         }
-        if(!strcmp(argv[0], "cd")){
+        if(!strcmp(argv[0], "cd")) {
             cd(buff+3);
-        }
-        else if(!strcmp(argv[0], "pwd")){
+        } else if(!strcmp(argv[0], "pwd")) {
             pwd();
-        }
-        else if(!strcmp(argv[0], "ls")){
+        } else if(!strcmp(argv[0], "ls")) {
             ls(argv);
-        }
-        else if(!strcmp(argv[0], "echo")){
+        } else if(!strcmp(argv[0], "echo")) {
             echo(argv);
-        }
-        else if(!strcmp(argv[0], "cat")){
+        } else if(!strcmp(argv[0], "cat")) {
             cat(argv);
-        }
-        else{
+        } else {
             printf("Unknown neibu or waibu command.\n");
         }
 
