@@ -15,7 +15,7 @@ int no_data_in_buffer(int bufferid, int cur){
 
 void *compute(void *arg){
 	int id = *(int *)arg;
-	int cur = buffer[id];
+	int cur = -1;
 	if(id == 1)
 		buffer[id] = 0;
 	while(1){
@@ -30,7 +30,6 @@ void *compute(void *arg){
 		printf("tid: %d, next_id: %d, calculate: %d\n", id, next_id, cur);
 
 		pthread_cond_signal(&wait_update_data_buffer[next_id]);
-
 		pthread_mutex_unlock(&mutex);
 	}
 
@@ -43,9 +42,10 @@ int main()
 	int ids[THREAD_N+1];
 
 	pthread_t thread[THREAD_N+1];
-	memset(buffer, -1, sizeof(buffer));
-	for(i = 1; i <= THREAD_N; i++)
+	for(i = 1; i <= THREAD_N; i++) buffer[i] = -1;
+	for(i = 1; i <= THREAD_N; i++){
 		pthread_cond_init(&wait_update_data_buffer[i], NULL);
+	}
 	for(i = 1; i <= THREAD_N; i++){
 		ids[i] = i;
 		pthread_create(&thread[i], NULL, compute, (void *)&ids[i]);
